@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Text;
 
 namespace ChatServer
 {
@@ -43,7 +44,7 @@ namespace ChatServer
                         WriteToFile(message);
 
                         Console.WriteLine(message);
-                        server.BroadcastMessage(message, this.Id);
+                        // server.BroadcastMessage(message, this.Id);
                     }
                     catch
                     {
@@ -71,21 +72,57 @@ namespace ChatServer
 
         private void WriteToFile(string message)
         {
-            using (BinaryWriter writer = new BinaryWriter(File.Open( $"{userName}Messages.txt", FileMode.Append)))
+
+            FileStream fileStream = new FileStream($"..\\..\\..\\..\\Messages\\{userName}Messages.txt", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            using (BinaryWriter writer = new BinaryWriter(fileStream))
             {
-                writer.Write(message + " " + DateTime.Now.ToString() + "\n");
+                //fileStream.Lock(0, fileStream.Length);
+                writer.Write(message + " ");
+                writer.Write(DateTime.Now.ToString()+ "\n");
+                Task.Delay(6000).Wait();
             }
         }
 
         // чтение входящего сообщения и преобразование в строку
         private string GetMessage()
         {
-            string name;
+            string message;
             BinaryReader reader = new BinaryReader(Stream);
 
-            name = reader.ReadString();
+            message = reader.ReadString();
 
-            return name;
+            if (message[0] != '@')
+            {
+                return message;
+            }
+            else
+            {
+                foreach (var client in server.clients)
+                {
+                    if (client.userName == message.Substring(1, message.Length - 1))
+                    {
+                        while (message != "@end")
+                        {
+                            message = reader.ReadString();
+                            client.GetPersonalMessage(message);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Такого пользователя нет!");
+                        return message;
+                    }
+                }
+                return $"{userName} Вернулся в общий чат";
+            }
+        }
+
+        private void GetPersonalMessage(string message)
+        {
+            byte[] data = Encoding.Unicode.GetBytes(message);
+
+            Stream.Write(data, 0, data.Length); //передача данных
+
 
         }
 

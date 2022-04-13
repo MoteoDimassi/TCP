@@ -9,6 +9,7 @@ namespace ChatServer
         static Thread listenThread; // потока для прослушивания
         static void Main(string[] args)
         {
+            Console.Title = "Server (общий чат)";
             try
             {
                 server = new ServerObject();

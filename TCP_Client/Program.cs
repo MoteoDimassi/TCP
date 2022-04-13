@@ -15,6 +15,7 @@ namespace ChatClient
         {
             Console.Write("Введите свое имя: ");
             userName = Console.ReadLine();
+            Console.Title = userName;
             client = new TcpClient();
             try
             {

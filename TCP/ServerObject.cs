@@ -12,7 +12,7 @@ namespace ChatServer
     {
         static TcpListener tcpListener; // сервер для прослушивания
         
-        List<ClientObject> clients = new List<ClientObject>(); // все подключения
+        internal List<ClientObject> clients = new List<ClientObject>(); // все подключения
 
         protected internal void AddConnection(ClientObject clientObject)
         {
@@ -62,6 +62,11 @@ namespace ChatServer
                     clients[i].Stream.Write(data, 0, data.Length); //передача данных
                 }
             }
+        }
+
+        void PesonalChat(ClientObject obj1, ClientObject obj2)
+        {
+
         }
         // отключение всех клиентов
         protected internal void Disconnect()
